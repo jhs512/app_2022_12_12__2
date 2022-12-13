@@ -1,0 +1,28 @@
+package com.ll.exam.app_2022_12_12__1.bounded_context.chat.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.util.UUID;
+
+@AllArgsConstructor
+@Getter
+@ToString
+public class Message {
+    private final UUID uuid;
+    private final String authorName;
+    private final String content;
+
+    public Message(String authorName, String content) {
+        this(UUID.randomUUID(), authorName, content);
+    }
+
+    public boolean isLateCreated(UUID otherUuid) {
+        return isEarlyCreated(otherUuid) == false;
+    }
+
+    public boolean isEarlyCreated(UUID otherUuid) {
+        return uuid.compareTo(otherUuid) < 0;
+    }
+}
