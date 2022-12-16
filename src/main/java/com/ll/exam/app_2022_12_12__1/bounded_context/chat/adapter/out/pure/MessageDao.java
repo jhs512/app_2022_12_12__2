@@ -26,7 +26,7 @@ public class MessageDao implements MessageSavePort, MessageLoadPort {
         }
 
         int index = IntStream.range(0, messages.size())
-                .filter(i -> messages.get(i).isLateCreated(fromUuid))
+                .filter(i -> messages.get(i).getUuid().equals(fromUuid))
                 .findFirst()
                 .orElse(-1);
 

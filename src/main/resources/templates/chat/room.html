@@ -1,3 +1,16 @@
+<div class="chat">
+    <form class="chat__write-message" onsubmit="Chat__writeMessage(this); return false;">
+        <input type="text" placeholder="작성자" name="authorName">
+        <input type="text" placeholder="내용을 입력해주세요." name="content">
+        <input type="submit" value="작성">
+    </form>
+    <div class="chat__message-box">
+        <ul class="chat__message-ul">
+
+        </ul>
+    </div>
+</div>
+
 <script>
     function fetchPost(url, data) {
         return fetch(url, {
@@ -28,15 +41,17 @@
 
     let Chat__lastLoadedUuid = "";
 
+    const Chat__elMessageUl = document.querySelector('.chat__message-ul');
+
     function Chat__drawMessages(messages) {
         if ( messages.length == 0 ) return;
 
         Chat__lastLoadedUuid = messages[messages.length - 1].uuid;
 
         messages.forEach((message) => {
-            document.querySelector('.chat__message-ul')
+            Chat__elMessageUl
                 .insertAdjacentHTML(
-                    "beforeBegin",
+                    "afterBegin",
                     `<li>${message.authorName} : ${message.content}</li>`
                 );
         });
@@ -48,7 +63,6 @@
         })
             .then(body => {
                 Chat__drawMessages(body.data.messages);
-                setTimeout(Chat__loadMore, 5000);
             });
     }
 
@@ -80,20 +94,11 @@
         form.content.focus();
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    const sse = new EventSource("/sse/connect");
+
+    sse.addEventListener('chat__messageAdded', e => {
         Chat__loadMore();
-    }, false);
+    });
+
+    Chat__loadMore();
 </script>
-
-<div class="chat">
-    <form class="chat__write-message" onsubmit="Chat__writeMessage(this); return false;">
-        <input type="text" placeholder="작성자" name="authorName">
-        <input type="text" placeholder="내용을 입력해주세요." name="content">
-        <input type="submit" value="작성">
-    </form>
-    <div class="chat__message-box">
-        <ul class="chat__message-ul">
-
-        </ul>
-    </div>
-</div>

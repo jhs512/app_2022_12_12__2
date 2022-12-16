@@ -1,5 +1,6 @@
 package com.ll.exam.app_2022_12_12__1.bounded_context.chat.adapter.in.http;
 
+import com.ll.exam.app_2022_12_12__1.base.SseEmitters;
 import com.ll.exam.app_2022_12_12__1.base.dto.RsData;
 import com.ll.exam.app_2022_12_12__1.bounded_context.chat.domain.model.Message;
 import com.ll.exam.app_2022_12_12__1.bounded_context.chat.port.in.GetMessagesUseCase;
@@ -15,6 +16,8 @@ import java.util.UUID;
 @RequestMapping("/chat")
 @RequiredArgsConstructor
 public class ChatController {
+    private final SseEmitters sseEmitters;
+
     // writeMessageUseCase 시작 //
     private final WriteMessageUseCase writeMessageUseCase;
 
@@ -27,7 +30,9 @@ public class ChatController {
     @PostMapping("/writeMessage")
     @ResponseBody
     public RsData<WriteMessageResponse> writeMessage(@RequestBody WriteMessageRequest request) {
+
         UUID writeUuid = writeMessageUseCase.write(request.authorName, request.content);
+        sseEmitters.noti("chat__messageAdded");
 
         return RsData.successOf(new WriteMessageResponse(writeUuid));
     }
